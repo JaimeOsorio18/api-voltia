@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.views import get_equipos, get_mantenimientos, get_lecturas, create_equipo, create_mantenimiento, create_lectura, cargar_ejemplos, main_view, protected_view, register_user
+from api.views import get_equipos, get_mantenimientos, get_lecturas, create_equipo, create_mantenimiento, create_lectura, cargar_ejemplos, main_view, protected_view, register_user, login
 
 urlpatterns = [
     path('main/', main_view),
@@ -32,5 +32,6 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('protected/', protected_view, name='protected'),
     path('register/', register_user, name='register'),
+    # path('login/', login, name='login'),
 ]
 

@@ -1,0 +1,19 @@
+Corrección a la base de datos
+Implementar logica para normalizar las unidades de medición de las lecturas, esto con el fin de cambiar este campo "valor"
+sea establecido con un double o un entero a la espera de futuras operaciones o movimientos, el dejarlo definido como un string,
+quita la posibilidad de operar este valor
+
+Corrección en el codigo  
+
+El nuevo codigo que reemplazaria la consulta ineficiente es:
+
+def obtener_mantenimientos_eficiente(equipo_id):
+    query = "SELECT * FROM Mantenimientos"
+    cursor.execute(query)
+    mantenimientos = cursor.fetchall()
+    mantenimientos_equipo = [mantenimiento for mantenimiento in mantenimientos if mantenimiento[1] == equipo_id]
+    return mantenimientos_equipo
+
+Refactorizando el codigo, logramos mayor legibilidad a nivel del codigo y de la respuesta, eficiencia de memoria y rendimiento, esto debido
+a que al comprimir los valores que serán agregados a la lista final "mantenimientos_equipo", esto evitando el añadir registros irrelevantes
+y a su vez evita hacer comparaciones, también en primera instancia podemos ver una reducción en la cantidad de codigo. 

@@ -6,10 +6,24 @@ from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Equipo, Mantenimiento, Lectura
 from .serializers import EquipoSerializer, MantenimientoSerializer, LecturaSerializer
+from django.contrib.auth import authenticate
+from rest_framework import status
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 @api_view(['GET'])
 def main_view(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     equipos = Equipo.objects.all()
     mantenimientos = Mantenimiento.objects.all()
     lecturas = Lectura.objects.all()
@@ -28,24 +42,64 @@ def main_view(request):
 
 @api_view(['GET'])
 def get_equipos(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     equipos = Equipo.objects.all()
     serializer = EquipoSerializer(equipos, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def get_mantenimientos(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     mantenimientos = Mantenimiento.objects.all()
     serializer = MantenimientoSerializer(mantenimientos, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def get_lecturas(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     lecturas = Lectura.objects.all()
     serializer = LecturaSerializer(lecturas, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
 def create_equipo(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     serializer = EquipoSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -54,6 +108,16 @@ def create_equipo(request):
 
 @api_view(['POST'])
 def create_mantenimiento(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     serializer = MantenimientoSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -62,6 +126,16 @@ def create_mantenimiento(request):
 
 @api_view(['POST'])
 def create_lectura(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     serializer = LecturaSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -70,6 +144,16 @@ def create_lectura(request):
 
 @api_view(['GET'])
 def cargar_ejemplos(request):
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
     insertar_ejemplos_django()
     return Response("Ejemplos cargados correctamente.", status=200)
 
@@ -96,9 +180,18 @@ def insertar_ejemplos_django():
     lectura3.save()
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def protected_view(request):
-        return Response({'message': 'Esta es una ruta protegida. Solo se puede acceder con un token válido.'})
+    token = request.headers.get('Authorization')
+    if not token:
+        return Response('Token is missing', status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = JWTAuthentication().authenticate(request)
+        if user is None:
+            return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    except InvalidToken:
+        return Response('Invalid token', status=status.HTTP_401_UNAUTHORIZED)
+    return Response({'message': 'Esta es una ruta protegida. Solo se puede acceder con un token válido.'})
 
 @api_view(['POST'])
 def register_user(request):
@@ -117,7 +210,21 @@ def register_user(request):
     refresh = RefreshToken.for_user(user)
 
     return Response({
-        'message': 'Usuario registrado exitosamente.',
-        'access_token': str(refresh.access_token),
-        'refresh_token': str(refresh),
+        'message': 'Usuario registrado exitosamente.'
     })
+
+@api_view(['POST'])
+def login(self, request):
+    username = request.data.get('usuario')
+    password = request.data.get('contraseña')
+
+    user = authenticate(username=username, password=password)
+
+    if user is not None:
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
+        return Response({'access_token': access_token})
+        
+    return Response({'error': 'Credenciales inválidas'}, status=401)
+
